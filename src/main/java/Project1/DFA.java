@@ -1,6 +1,7 @@
 package Project1;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,13 +29,17 @@ public class DFA {
 
     // this method is the first thing called when the program is ran.
     public void start() {
-        System.out.println("Chase Clark DFA program");
+        System.out.println("Chase Clark's DFA program");
+        System.out.println();
         System.out.println("Starting program...");
         System.out.println();
 
         loadInputFiles();
         runDFA();
         writeResultsToFile();
+
+        System.out.println("Program finished!");
+
     }
 
     private void loadInputFiles() {
@@ -84,7 +89,8 @@ public class DFA {
                 transitionsMap.put(arr[0] + arr[1], arr[2]);
             }
 
-            System.out.println("Loading done!");
+            System.out.println("Loading done...");
+            System.out.println();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,12 +103,11 @@ public class DFA {
      * accepted"
      */
     private void runDFA() {
-        // TODO: find out why all strings are rejected
-        boolean accepted = true;
         // initialize resultsList
         resultsList = new ArrayList<String>();
         for (String input : inputStrings) {
             // make sure to set current state = initial state at the beginning of the loop
+            boolean accepted = true;
             currentState = initialState;
             for (String letter : input.replace(" ", "").split("")) {
                 if (letter.isBlank()) {// check if input is blank
@@ -131,8 +136,10 @@ public class DFA {
      * This method takes the resultsList and writes it to a .txt file
      */
     private void writeResultsToFile() {
-        // TODO: delete the file and create a new one
         String path = "COSC485_P1_AnswersDFA.txt";
+        // delete the answers file and create a new one
+        File file = new File(path);
+        file.delete();
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(path, true));
             for (String res : resultsList) {
@@ -140,6 +147,8 @@ public class DFA {
                 writer.newLine();
             }
             writer.close();
+            System.out.println("File: " + path + " was created...");
+            System.out.println();
         } catch (Exception e) {
             e.printStackTrace();
         }
