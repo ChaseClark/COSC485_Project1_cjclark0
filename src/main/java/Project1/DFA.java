@@ -1,8 +1,11 @@
 package Project1;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +23,7 @@ public class DFA {
     private List<String> alphabetList;
     private List<String> statesList;
     private List<String> finalStatesList;
+    private ArrayList<String> resultsList;
     private HashMap<String, String> transitionsMap;
 
     // this method is the first thing called when the program is ran.
@@ -30,6 +34,7 @@ public class DFA {
 
         loadInputFiles();
         runDFA();
+        writeResultsToFile();
     }
 
     private void loadInputFiles() {
@@ -92,7 +97,52 @@ public class DFA {
      * accepted"
      */
     private void runDFA() {
-        // make sure to set current state = initial state at the beginning of the loop
+        // TODO: find out why all strings are rejected
+        boolean accepted = true;
+        // initialize resultsList
+        resultsList = new ArrayList<String>();
+        for (String input : inputStrings) {
+            // make sure to set current state = initial state at the beginning of the loop
+            currentState = initialState;
+            for (String letter : input.replace(" ", "").split("")) {
+                if (letter.isBlank()) {// check if input is blank
+                    accepted = false;
+                    break; // no need to process further
+                } else if (transitionsMap.containsKey(currentState + letter)) {
+                    // check if current state + letter is a valid transition
+                    // then transition to the next state
+                    currentState = transitionsMap.get(currentState + letter);
+                } else { // invalid transition
+                    accepted = false;
+                    break;
+                }
+            }
+            // after inner loop is done we need to check if the current state is one of the
+            // listed final states
+            if (!finalStatesList.contains(currentState))
+                accepted = false;
+
+            // add result string to list so we can write it to file later
+            resultsList.add(input + " is " + (accepted ? "accepted" : "rejected"));
+        }
+    }
+
+    /**
+     * This method takes the resultsList and writes it to a .txt file
+     */
+    private void writeResultsToFile() {
+        // TODO: delete the file and create a new one
+        String path = "COSC485_P1_AnswersDFA.txt";
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path, true));
+            for (String res : resultsList) {
+                writer.append(res);
+                writer.newLine();
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
